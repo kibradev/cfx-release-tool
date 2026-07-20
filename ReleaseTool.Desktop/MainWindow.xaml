@@ -1,0 +1,490 @@
+<Window x:Class="ReleaseTool.Desktop.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:views="clr-namespace:ReleaseTool.Desktop.Views"
+        xmlns:vm="clr-namespace:ReleaseTool.Desktop.ViewModels"
+        Title="FiveM Release Aracı v1.1.0"
+        Width="1200"
+        Height="780"
+        MinWidth="980"
+        MinHeight="650"
+        Background="{StaticResource BgBrush}"
+        WindowStartupLocation="CenterScreen">
+    <Window.DataContext>
+        <vm:MainViewModel />
+    </Window.DataContext>
+
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <Grid Grid.Row="0" Margin="0,0,0,16">
+            <StackPanel>
+                <TextBlock Text="FIVEM RELEASE"
+                           FontSize="11"
+                           FontWeight="SemiBold"
+                           Foreground="{StaticResource TextSecondaryBrush}" />
+                <TextBlock Text="Resource release aracı"
+                           FontSize="26"
+                           FontWeight="SemiBold"
+                           Foreground="{StaticResource TextPrimaryBrush}" />
+                <TextBlock Text="Klasörü sürükle-bırak veya seç · Escrow dosyalarını işaretle · ZIP'leri kaydet"
+                           FontSize="12"
+                           Foreground="{StaticResource TextSecondaryBrush}"
+                           Margin="0,4,0,0" />
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top">
+                <Button Content="Ayarlar"
+                        Style="{StaticResource SmallButton}"
+                        Command="{Binding OpenAppSettingsCommand}"
+                        Margin="0,0,6,0" />
+                <Button Content="Portal ayarları"
+                        Style="{StaticResource SmallButton}"
+                        Command="{Binding OpenPortalSettingsCommand}"
+                        Margin="0,0,6,0"
+                        ToolTip="Cookie + Asset ID yapılandır" />
+                <Button Content="Portal'a yükle"
+                        Style="{StaticResource SmallButton}"
+                        Command="{Binding UploadToPortalCommand}"
+                        Margin="0,0,6,0"
+                        ToolTip="Son escrow ZIP'i Portal'a yükle" />
+                <Button Content="Portal"
+                        Style="{StaticResource SmallButton}"
+                        Command="{Binding OpenKeymasterPortalCommand}"
+                        Margin="0,0,6,0"
+                        ToolTip="Asset sayfasını tarayıcıda aç" />
+                <Button Style="{StaticResource SmallButton}"
+                        Command="{Binding ToggleLanguageCommand}"
+                        Margin="0,0,6,0"
+                        ToolTip="TR / EN">
+                    <TextBlock Text="TR/EN" />
+                </Button>
+                <Button Style="{StaticResource SmallButton}"
+                        Command="{Binding ToggleDarkThemeCommand}"
+                        ToolTip="Tema değiştir">
+                    <TextBlock Text="Tema" />
+                </Button>
+            </StackPanel>
+        </Grid>
+
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="280" />
+                <ColumnDefinition Width="16" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <!-- Sol panel -->
+            <Border Grid.Column="0"
+                    Background="{StaticResource PanelBrush}"
+                    BorderBrush="{StaticResource BorderBrush}"
+                    BorderThickness="1"
+                    CornerRadius="12"
+                    Padding="12">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <StackPanel>
+                        <TextBlock Text="RESOURCES"
+                                   FontSize="11"
+                                   FontWeight="SemiBold"
+                                   Foreground="{StaticResource TextSecondaryBrush}"
+                                   Margin="0,0,0,8" />
+                        <Button Content="Klasör seç…"
+                                Command="{Binding BrowseResourcesFolderCommand}"
+                                Margin="0,0,0,6" />
+                        <TextBlock Text="{Binding ResourcesFolder}"
+                                   FontSize="10"
+                                   Foreground="{StaticResource TextSecondaryBrush}"
+                                   TextTrimming="CharacterEllipsis"
+                                   ToolTip="{Binding ResourcesFolder}"
+                                   Margin="0,0,0,10" />
+
+                        <ComboBox ItemsSource="{Binding ResourcesFolderList}"
+                                  SelectedItem="{Binding SelectedResourcesFolder}"
+                                  Margin="0,0,0,6"
+                                  Padding="6,4"
+                                  Visibility="{Binding ResourcesFolderList.Count, Converter={StaticResource NullToVisibility}}" />
+                        <CheckBox Content="Klasörü izle"
+                                  IsChecked="{Binding WatchEnabled}"
+                                  Margin="0,0,0,6"
+                                  FontSize="11"
+                                  Foreground="{StaticResource TextSecondaryBrush}" />
+                        <TextBlock Text="Son kullanılan"
+                                   FontSize="10"
+                                   Foreground="{StaticResource TextSecondaryBrush}"
+                                   Margin="0,0,0,4"
+                                   Visibility="{Binding RecentResourceNames.Count, Converter={StaticResource NullToVisibility}}" />
+                        <ItemsControl ItemsSource="{Binding RecentResourceNames}" Margin="0,0,0,8">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <WrapPanel />
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Button Content="{Binding}"
+                                            Style="{StaticResource SmallButton}"
+                                            Command="{Binding DataContext.OpenRecentResourceCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                            CommandParameter="{Binding}"
+                                            Margin="0,0,4,4" />
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+
+                        <Grid Margin="0,0,0,6">
+                            <TextBlock Text="Scriptler"
+                                       VerticalAlignment="Center"
+                                       FontSize="12"
+                                       Foreground="{StaticResource TextSecondaryBrush}" />
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                <Button Content="Tümü"
+                                        Style="{StaticResource SmallButton}"
+                                        Command="{Binding SelectAllBatchCommand}"
+                                        Margin="0,0,4,0" />
+                                <Button Content="Temizle"
+                                        Style="{StaticResource SmallButton}"
+                                        Command="{Binding ClearBatchCommand}"
+                                        Margin="0,0,4,0" />
+                                <Button Content="↻"
+                                        Style="{StaticResource SmallButton}"
+                                        Command="{Binding RefreshResourcesCommand}" />
+                            </StackPanel>
+                        </Grid>
+
+                        <ItemsControl ItemsSource="{Binding Resources}" Margin="0,0,0,8">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid Margin="0,1">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+                                        <CheckBox IsChecked="{Binding IsBatchSelected, Mode=TwoWay}"
+                                                  VerticalAlignment="Center"
+                                                  Margin="0,0,6,0"
+                                                  ToolTip="Toplu release için seç" />
+                                        <Button Grid.Column="1"
+                                                Style="{StaticResource ListItemButton}"
+                                                Command="{Binding DataContext.SelectResourceCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                CommandParameter="{Binding}">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*" />
+                                                    <ColumnDefinition Width="Auto" />
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock Text="{Binding Name}" FontWeight="Medium" />
+                                                <TextBlock Grid.Column="1"
+                                                           Text="{Binding Version, StringFormat=v{0}}"
+                                                           Foreground="{StaticResource TextSecondaryBrush}"
+                                                           FontSize="11"
+                                                           Margin="8,0,0,0" />
+                                            </Grid>
+                                        </Button>
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+
+                        <Button Content="{Binding BatchSelectedCount, StringFormat='Toplu release ({0})'}"
+                                Style="{StaticResource PrimaryButton}"
+                                Command="{Binding CreateBatchReleaseCommand}"
+                                Margin="0,0,0,12" />
+
+                        <Separator Background="{StaticResource BorderBrush}" Margin="0,0,0,10" />
+
+                        <TextBlock Text="ÇIKTI KLASÖRÜ"
+                                   FontSize="11"
+                                   FontWeight="SemiBold"
+                                   Foreground="{StaticResource TextSecondaryBrush}"
+                                   Margin="0,0,0,6" />
+                        <Button Content="Çıktı klasörü…"
+                                Command="{Binding BrowseOutputFolderCommand}"
+                                Margin="0,0,0,6" />
+                        <TextBlock Text="{Binding OutputFolder}"
+                                   FontSize="10"
+                                   Foreground="{StaticResource TextSecondaryBrush}"
+                                   TextTrimming="CharacterEllipsis"
+                                   Margin="0,0,0,12" />
+
+                        <TextBlock Text="GEÇMİŞ"
+                                   FontSize="11"
+                                   FontWeight="SemiBold"
+                                   Foreground="{StaticResource TextSecondaryBrush}"
+                                   Margin="0,0,0,6" />
+                        <ItemsControl ItemsSource="{Binding ReleaseHistory}"
+                                      Visibility="{Binding HasHistory, Converter={StaticResource BoolToVisibility}}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Button Style="{StaticResource ListItemButton}"
+                                            Command="{Binding DataContext.OpenHistoryEntryCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                            CommandParameter="{Binding}"
+                                            Padding="8,6">
+                                        <StackPanel>
+                                            <TextBlock FontSize="12" FontWeight="Medium">
+                                                <Run Text="{Binding ResourceName}" />
+                                                <Run Text=" v" />
+                                                <Run Text="{Binding Version}" />
+                                            </TextBlock>
+                                            <TextBlock Text="{Binding CreatedAt, StringFormat={}{0:dd.MM.yyyy HH:mm}}"
+                                                       FontSize="10"
+                                                       Foreground="{StaticResource TextSecondaryBrush}" />
+                                        </StackPanel>
+                                    </Button>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                        <TextBlock Text="Henüz release yok"
+                                   FontSize="11"
+                                   Foreground="{StaticResource TextSecondaryBrush}"
+                                   Visibility="{Binding HasHistory, Converter={StaticResource BoolToVisibility}, ConverterParameter=invert}" />
+                    </StackPanel>
+                </ScrollViewer>
+            </Border>
+
+            <!-- Sağ panel -->
+            <Border Grid.Column="2"
+                    Background="{StaticResource PanelBrush}"
+                    BorderBrush="{StaticResource BorderBrush}"
+                    BorderThickness="1"
+                    CornerRadius="12"
+                    Padding="18">
+                <Grid>
+                    <StackPanel VerticalAlignment="Center"
+                                HorizontalAlignment="Center"
+                                Visibility="{Binding HasSelectedResource, Converter={StaticResource BoolToVisibility}, ConverterParameter=invert}">
+                        <TextBlock Text="Resources klasörünü seçin veya sürükleyip bırakın"
+                                   Foreground="{StaticResource TextSecondaryBrush}"
+                                   HorizontalAlignment="Center"
+                                   Margin="0,4" />
+                    </StackPanel>
+
+                    <ScrollViewer VerticalScrollBarVisibility="Auto"
+                                  Visibility="{Binding HasSelectedResource, Converter={StaticResource BoolToVisibility}}">
+                        <StackPanel>
+                            <Grid Margin="0,0,0,12">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel>
+                                    <TextBlock Text="{Binding SelectedResourceName}"
+                                               FontSize="20"
+                                               FontWeight="SemiBold"
+                                               Foreground="{StaticResource TextPrimaryBrush}" />
+                                    <TextBlock FontSize="12" Foreground="{StaticResource TextSecondaryBrush}">
+                                        <Run Text="Manifest:" />
+                                        <Run Text="{Binding ManifestFileName}" />
+                                    </TextBlock>
+                                </StackPanel>
+                                <Border Grid.Column="1"
+                                        Background="{StaticResource VersionBgBrush}"
+                                        BorderBrush="{StaticResource VersionBorderBrush}"
+                                        BorderThickness="1"
+                                        CornerRadius="8"
+                                        Padding="12,6">
+                                    <TextBlock Text="{Binding CurrentVersion, StringFormat=v{0}}"
+                                               FontWeight="SemiBold"
+                                               Foreground="{StaticResource VersionTextBrush}" />
+                                </Border>
+                            </Grid>
+
+                            <Border Background="{StaticResource WarningBgBrush}"
+                                    CornerRadius="8"
+                                    Padding="10"
+                                    Margin="0,0,0,10"
+                                    Visibility="{Binding HasManifestWarnings, Converter={StaticResource BoolToVisibility}}">
+                                <TextBlock Text="{Binding ManifestWarnings}"
+                                           TextWrapping="Wrap"
+                                           Foreground="{StaticResource WarningTextBrush}"
+                                           FontSize="11" />
+                            </Border>
+
+                            <Grid Margin="0,0,0,10">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="10" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <Button Grid.Column="0"
+                                        Style="{StaticResource PrimaryButton}"
+                                        Content="Release oluştur"
+                                        Command="{Binding CreateReleaseCommand}" />
+                                <Button Grid.Column="2"
+                                        Content="Sürüm artır"
+                                        Command="{Binding BumpPatchCommand}" />
+                            </Grid>
+
+                            <Grid Margin="0,0,0,8">
+                                <CheckBox Content="Release'te sürüm artır"
+                                          IsChecked="{Binding BumpOnRelease}"
+                                          Foreground="{StaticResource TextSecondaryBrush}" />
+                            </Grid>
+                            <ComboBox ItemsSource="{Binding VersionBumpOptions}"
+                                      SelectedItem="{Binding SelectedVersionBump}"
+                                      Margin="0,0,0,6"
+                                      Padding="8,6" />
+                            <TextBox Text="{Binding ManualVersionText, UpdateSourceTrigger=PropertyChanged}"
+                                     Margin="0,0,0,10"
+                                     Padding="8,6"
+                                     ToolTip="Örn: 2.1.0-beta"
+                                     Visibility="{Binding ShowManualVersion, Converter={StaticResource BoolToVisibility}}" />
+
+                            <ProgressBar Value="{Binding ProgressPercent}"
+                                         Maximum="100"
+                                         Height="6"
+                                         Margin="0,0,0,10"
+                                         Visibility="{Binding ShowProgress, Converter={StaticResource BoolToVisibility}}" />
+
+                            <WrapPanel Margin="0,0,0,10">
+                                <Button Content="Escrow özeti"
+                                        Style="{StaticResource SmallButton}"
+                                        Command="{Binding PreviewEscrowSummaryCommand}"
+                                        Margin="0,0,6,6" />
+                                <Button Content="fxmanifest"
+                                        Style="{StaticResource SmallButton}"
+                                        Command="{Binding EditFxManifestCommand}"
+                                        Margin="0,0,6,6" />
+                                <Button Content="CHANGELOG"
+                                        Style="{StaticResource SmallButton}"
+                                        Command="{Binding EditChangelogCommand}"
+                                        Margin="0,0,6,6" />
+                                <Button Content="Manifest lint"
+                                        Style="{StaticResource SmallButton}"
+                                        Command="{Binding LintManifestCommand}"
+                                        Margin="0,0,6,6" />
+                                <Button Content="ZIP doğrula"
+                                        Style="{StaticResource SmallButton}"
+                                        Command="{Binding VerifyLastZipsCommand}"
+                                        Margin="0,0,6,6" />
+                                <Button Content="Karşılaştır"
+                                        Style="{StaticResource SmallButton}"
+                                        Command="{Binding CompareWithPreviousReleaseCommand}"
+                                        Margin="0,0,6,6" />
+                                <Button Content="Profil dışa"
+                                        Style="{StaticResource SmallButton}"
+                                        Command="{Binding ExportEscrowProfileCommand}"
+                                        Margin="0,0,6,6" />
+                                <Button Content="Profil içe"
+                                        Style="{StaticResource SmallButton}"
+                                        Command="{Binding ImportEscrowProfileCommand}"
+                                        Margin="0,0,6,6" />
+                                <Button Content="Portal oturum"
+                                        Style="{StaticResource SmallButton}"
+                                        Command="{Binding RefreshPortalSessionCommand}"
+                                        Margin="0,0,6,6" />
+                            </WrapPanel>
+
+                            <WrapPanel Margin="0,0,0,10">
+                                <Button Content="Manifest önizle"
+                                        Style="{StaticResource SmallButton}"
+                                        Command="{Binding PreviewManifestCommand}"
+                                        Margin="0,0,6,6" />
+                                <Button Content="release.ignore"
+                                        Style="{StaticResource SmallButton}"
+                                        Command="{Binding EditReleaseIgnoreCommand}"
+                                        Margin="0,0,6,6" />
+                            </WrapPanel>
+
+                            <TextBlock Text="{Binding StatusText}"
+                                       Foreground="{StaticResource AccentBrush}"
+                                       FontSize="12"
+                                       Margin="0,0,0,8"
+                                       Visibility="{Binding StatusText, Converter={StaticResource NullToVisibility}}" />
+
+                            <ItemsControl ItemsSource="{Binding LastZips}"
+                                          Margin="0,0,0,10"
+                                          Visibility="{Binding HasLastZips, Converter={StaticResource BoolToVisibility}}">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <WrapPanel />
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Orientation="Horizontal" Margin="0,0,8,6">
+                                            <Button Content="{Binding Mode, Converter={StaticResource ModeToLabel}}"
+                                                    Style="{StaticResource SmallButton}"
+                                                    Command="{Binding DataContext.OpenZipCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                    CommandParameter="{Binding}"
+                                                    Margin="0,0,4,0" />
+                                            <Button Content="Klasör"
+                                                    Style="{StaticResource SmallButton}"
+                                                    Command="{Binding DataContext.ShowZipFolderCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                    CommandParameter="{Binding}" />
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+
+                            <Separator Background="{StaticResource BorderBrush}" Margin="0,4,0,12" />
+
+                            <Grid Margin="0,0,0,8">
+                                <TextBlock VerticalAlignment="Center" Foreground="{StaticResource TextSecondaryBrush}">
+                                    <Run Text="Escrow dosyaları —" />
+                                    <Run Text="{Binding SelectedEscrowCount}" FontWeight="SemiBold" />
+                                    <Run Text="seçili" />
+                                </TextBlock>
+                            </Grid>
+
+                            <WrapPanel Margin="0,0,0,8">
+                                <Button Content="Tüm .lua"
+                                        Style="{StaticResource SmallButton}"
+                                        Command="{Binding SelectAllLuaCommand}"
+                                        Margin="0,0,6,6" />
+                                <Button Content="Tümünü seç"
+                                        Style="{StaticResource SmallButton}"
+                                        Command="{Binding SelectAllFilesCommand}"
+                                        Margin="0,0,6,6" />
+                                <Button Content="Temizle"
+                                        Style="{StaticResource SmallButton}"
+                                        Command="{Binding ClearSelectionCommand}"
+                                        Margin="0,0,6,6" />
+                                <Button Content="Sadece otomatik"
+                                        Style="{StaticResource SmallButton}"
+                                        Command="{Binding KeepOnlyAutoSuggestedCommand}"
+                                        Margin="0,0,6,6" />
+                            </WrapPanel>
+
+                            <TextBox Text="{Binding FileTreeFilter, UpdateSourceTrigger=PropertyChanged}"
+                                     Margin="0,0,0,8"
+                                     Padding="8,6"
+                                     FontSize="12"
+                                     Background="{StaticResource TreeBgBrush}"
+                                     Foreground="{StaticResource TextPrimaryBrush}"
+                                     BorderBrush="{StaticResource BorderBrush}"
+                                     ToolTip="Dosya ağacında ara (config, shared…)" />
+
+                            <Border Background="{StaticResource TreeBgBrush}"
+                                    BorderBrush="{StaticResource BorderBrush}"
+                                    BorderThickness="1"
+                                    CornerRadius="10"
+                                    Padding="8"
+                                    MinHeight="240">
+                                <Grid>
+                                    <TextBlock Text="Dosyalar okunuyor…"
+                                               HorizontalAlignment="Center"
+                                               VerticalAlignment="Center"
+                                               Foreground="{StaticResource TextSecondaryBrush}"
+                                               Visibility="{Binding IsBusy, Converter={StaticResource BoolToVisibility}}" />
+                                    <ScrollViewer VerticalScrollBarVisibility="Auto"
+                                                  MaxHeight="420"
+                                                  Visibility="{Binding IsBusy, Converter={StaticResource BoolToVisibility}, ConverterParameter=invert}">
+                                        <ItemsControl ItemsSource="{Binding FileTree}">
+                                            <ItemsControl.ItemTemplate>
+                                                <DataTemplate>
+                                                    <views:FileTreeItemView Node="{Binding}" />
+                                                </DataTemplate>
+                                            </ItemsControl.ItemTemplate>
+                                        </ItemsControl>
+                                    </ScrollViewer>
+                                </Grid>
+                            </Border>
+                        </StackPanel>
+                    </ScrollViewer>
+                </Grid>
+            </Border>
+        </Grid>
+    </Grid>
+</Window>

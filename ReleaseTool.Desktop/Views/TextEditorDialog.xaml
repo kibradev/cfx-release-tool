@@ -1,0 +1,44 @@
+<Window x:Class="ReleaseTool.Desktop.Views.TextEditorDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Düzenle"
+        Width="640"
+        Height="480"
+        MinWidth="480"
+        MinHeight="320"
+        WindowStartupLocation="CenterOwner"
+        Background="{StaticResource BgBrush}">
+    <Grid Margin="16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <TextBox x:Name="EditorBox"
+                 Grid.Row="0"
+                 AcceptsReturn="True"
+                 AcceptsTab="True"
+                 VerticalScrollBarVisibility="Auto"
+                 HorizontalScrollBarVisibility="Auto"
+                 FontFamily="Consolas"
+                 FontSize="13"
+                 Padding="10"
+                 Background="{StaticResource PanelBrush}"
+                 Foreground="{StaticResource TextPrimaryBrush}"
+                 BorderBrush="{StaticResource BorderBrush}" />
+        <StackPanel Grid.Row="1"
+                    Orientation="Horizontal"
+                    HorizontalAlignment="Right"
+                    Margin="0,12,0,0">
+            <Button x:Name="SaveButton"
+                    Content="Kaydet"
+                    Style="{StaticResource PrimaryButton}"
+                    Padding="16,8"
+                    Margin="0,0,8,0"
+                    Click="SaveButton_Click" />
+            <Button x:Name="CloseButton"
+                    Content="Kapat"
+                    Padding="16,8"
+                    Click="CloseButton_Click" />
+        </StackPanel>
+    </Grid>
+</Window>
