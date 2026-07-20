@@ -32,7 +32,7 @@ echo dotnet: %DOTNET_EXE%
 "%DOTNET_EXE%" --version
 if errorlevel 1 exit /b 1
 
-"%DOTNET_EXE%" publish ReleaseTool.Desktop\ReleaseTool.Desktop.csproj ^
+"%DOTNET_EXE%" publish ReleaseTool.csproj ^
   -c Release ^
   -r win-x64 ^
   --self-contained true ^
