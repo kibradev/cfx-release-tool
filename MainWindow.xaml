@@ -3,12 +3,12 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:views="clr-namespace:ReleaseTool.Desktop.Views"
         xmlns:vm="clr-namespace:ReleaseTool.Desktop.ViewModels"
-        Title="FiveM Release Aracı v1.1.0"
+        Title="FiveM Release Aracı v1.2.0"
         Width="1200"
         Height="780"
         MinWidth="980"
         MinHeight="650"
-        Background="{StaticResource BgBrush}"
+        Background="{DynamicResource BgBrush}"
         WindowStartupLocation="CenterScreen">
     <Window.DataContext>
         <vm:MainViewModel />
@@ -23,80 +23,108 @@
         <!-- Header -->
         <Grid Grid.Row="0" Margin="0,0,0,16">
             <StackPanel>
-                <TextBlock Text="FIVEM RELEASE"
+                <TextBlock Text="{Binding Loc[header_kicker]}"
                            FontSize="11"
                            FontWeight="SemiBold"
-                           Foreground="{StaticResource TextSecondaryBrush}" />
-                <TextBlock Text="Resource release aracı"
+                           Foreground="{DynamicResource TextSecondaryBrush}" />
+                <TextBlock Text="{Binding Loc[header_title]}"
                            FontSize="26"
                            FontWeight="SemiBold"
-                           Foreground="{StaticResource TextPrimaryBrush}" />
-                <TextBlock Text="Klasörü sürükle-bırak veya seç · Escrow dosyalarını işaretle · ZIP'leri kaydet"
+                           Foreground="{DynamicResource TextPrimaryBrush}" />
+                <TextBlock Text="{Binding Loc[header_subtitle]}"
                            FontSize="12"
-                           Foreground="{StaticResource TextSecondaryBrush}"
+                           Foreground="{DynamicResource TextSecondaryBrush}"
                            Margin="0,4,0,0" />
             </StackPanel>
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top">
-                <Button Content="Ayarlar"
-                        Style="{StaticResource SmallButton}"
+                <Button Style="{DynamicResource SmallButton}"
                         Command="{Binding OpenAppSettingsCommand}"
-                        Margin="0,0,6,0" />
-                <Button Content="Portal ayarları"
-                        Style="{StaticResource SmallButton}"
+                        Margin="0,0,6,0"
+                        ToolTip="{Binding Loc[settings]}">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="⚙" Margin="0,0,5,0" />
+                        <TextBlock Text="{Binding Loc[settings]}" />
+                    </StackPanel>
+                </Button>
+                <Button Style="{DynamicResource SmallButton}"
                         Command="{Binding OpenPortalSettingsCommand}"
                         Margin="0,0,6,0"
-                        ToolTip="Cookie + Asset ID yapılandır" />
-                <Button Content="Portal'a yükle"
-                        Style="{StaticResource SmallButton}"
+                        ToolTip="Cookie + Asset ID yapılandır">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="🔑" Margin="0,0,5,0" />
+                        <TextBlock Text="{Binding Loc[portal_settings]}" />
+                    </StackPanel>
+                </Button>
+                <Button Style="{DynamicResource SmallButton}"
                         Command="{Binding UploadToPortalCommand}"
                         Margin="0,0,6,0"
-                        ToolTip="Son escrow ZIP'i Portal'a yükle" />
-                <Button Content="Portal"
-                        Style="{StaticResource SmallButton}"
+                        ToolTip="Son escrow ZIP'i Portal'a yükle">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="⬆" Margin="0,0,5,0" />
+                        <TextBlock Text="{Binding Loc[portal_upload]}" />
+                    </StackPanel>
+                </Button>
+                <Button Style="{DynamicResource SmallButton}"
                         Command="{Binding OpenKeymasterPortalCommand}"
                         Margin="0,0,6,0"
-                        ToolTip="Asset sayfasını tarayıcıda aç" />
-                <Button Style="{StaticResource SmallButton}"
+                        ToolTip="Asset sayfasını tarayıcıda aç">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="🌐" Margin="0,0,5,0" />
+                        <TextBlock Text="{Binding Loc[portal]}" />
+                    </StackPanel>
+                </Button>
+                <Button Style="{DynamicResource SmallButton}"
                         Command="{Binding ToggleLanguageCommand}"
                         Margin="0,0,6,0"
                         ToolTip="TR / EN">
-                    <TextBlock Text="TR/EN" />
+                    <TextBlock Text="🌍 TR/EN" />
                 </Button>
-                <Button Style="{StaticResource SmallButton}"
+                <Button Style="{DynamicResource SmallButton}"
                         Command="{Binding ToggleDarkThemeCommand}"
-                        ToolTip="Tema değiştir">
-                    <TextBlock Text="Tema" />
+                        ToolTip="{Binding Loc[theme]}">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="🎨" Margin="0,0,5,0" />
+                        <TextBlock Text="{Binding Loc[theme]}" />
+                    </StackPanel>
                 </Button>
             </StackPanel>
         </Grid>
 
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="280" />
+                <ColumnDefinition x:Name="LeftColumn" Width="280" MinWidth="220" />
                 <ColumnDefinition Width="16" />
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
 
+            <GridSplitter Grid.Column="1"
+                          Width="16"
+                          HorizontalAlignment="Center"
+                          VerticalAlignment="Stretch"
+                          Background="Transparent"
+                          ResizeBehavior="PreviousAndNext"
+                          ResizeDirection="Columns" />
+
             <!-- Sol panel -->
             <Border Grid.Column="0"
-                    Background="{StaticResource PanelBrush}"
-                    BorderBrush="{StaticResource BorderBrush}"
+                    Background="{DynamicResource PanelBrush}"
+                    BorderBrush="{DynamicResource BorderBrush}"
                     BorderThickness="1"
                     CornerRadius="12"
                     Padding="12">
                 <ScrollViewer VerticalScrollBarVisibility="Auto">
                     <StackPanel>
-                        <TextBlock Text="RESOURCES"
+                        <TextBlock Text="{Binding Loc[resources]}"
                                    FontSize="11"
                                    FontWeight="SemiBold"
-                                   Foreground="{StaticResource TextSecondaryBrush}"
+                                   Foreground="{DynamicResource TextSecondaryBrush}"
                                    Margin="0,0,0,8" />
-                        <Button Content="Klasör seç…"
+                        <Button Content="{Binding Loc[pick_folder]}"
                                 Command="{Binding BrowseResourcesFolderCommand}"
                                 Margin="0,0,0,6" />
                         <TextBlock Text="{Binding ResourcesFolder}"
                                    FontSize="10"
-                                   Foreground="{StaticResource TextSecondaryBrush}"
+                                   Foreground="{DynamicResource TextSecondaryBrush}"
                                    TextTrimming="CharacterEllipsis"
                                    ToolTip="{Binding ResourcesFolder}"
                                    Margin="0,0,0,10" />
@@ -106,14 +134,14 @@
                                   Margin="0,0,0,6"
                                   Padding="6,4"
                                   Visibility="{Binding ResourcesFolderList.Count, Converter={StaticResource NullToVisibility}}" />
-                        <CheckBox Content="Klasörü izle"
+                        <CheckBox Content="{Binding Loc[watch_folder]}"
                                   IsChecked="{Binding WatchEnabled}"
                                   Margin="0,0,0,6"
                                   FontSize="11"
-                                  Foreground="{StaticResource TextSecondaryBrush}" />
-                        <TextBlock Text="Son kullanılan"
+                                  Foreground="{DynamicResource TextSecondaryBrush}" />
+                        <TextBlock Text="{Binding Loc[recent]}"
                                    FontSize="10"
-                                   Foreground="{StaticResource TextSecondaryBrush}"
+                                   Foreground="{DynamicResource TextSecondaryBrush}"
                                    Margin="0,0,0,4"
                                    Visibility="{Binding RecentResourceNames.Count, Converter={StaticResource NullToVisibility}}" />
                         <ItemsControl ItemsSource="{Binding RecentResourceNames}" Margin="0,0,0,8">
@@ -125,7 +153,7 @@
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
                                     <Button Content="{Binding}"
-                                            Style="{StaticResource SmallButton}"
+                                            Style="{DynamicResource SmallButton}"
                                             Command="{Binding DataContext.OpenRecentResourceCommand, RelativeSource={RelativeSource AncestorType=Window}}"
                                             CommandParameter="{Binding}"
                                             Margin="0,0,4,4" />
@@ -134,21 +162,21 @@
                         </ItemsControl>
 
                         <Grid Margin="0,0,0,6">
-                            <TextBlock Text="Scriptler"
+                            <TextBlock Text="{Binding Loc[scripts]}"
                                        VerticalAlignment="Center"
                                        FontSize="12"
-                                       Foreground="{StaticResource TextSecondaryBrush}" />
+                                       Foreground="{DynamicResource TextSecondaryBrush}" />
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                                <Button Content="Tümü"
-                                        Style="{StaticResource SmallButton}"
+                                <Button Content="{Binding Loc[all]}"
+                                        Style="{DynamicResource SmallButton}"
                                         Command="{Binding SelectAllBatchCommand}"
                                         Margin="0,0,4,0" />
-                                <Button Content="Temizle"
-                                        Style="{StaticResource SmallButton}"
+                                <Button Content="{Binding Loc[clear]}"
+                                        Style="{DynamicResource SmallButton}"
                                         Command="{Binding ClearBatchCommand}"
                                         Margin="0,0,4,0" />
                                 <Button Content="↻"
-                                        Style="{StaticResource SmallButton}"
+                                        Style="{DynamicResource SmallButton}"
                                         Command="{Binding RefreshResourcesCommand}" />
                             </StackPanel>
                         </Grid>
@@ -166,7 +194,7 @@
                                                   Margin="0,0,6,0"
                                                   ToolTip="Toplu release için seç" />
                                         <Button Grid.Column="1"
-                                                Style="{StaticResource ListItemButton}"
+                                                Style="{DynamicResource ListItemButton}"
                                                 Command="{Binding DataContext.SelectResourceCommand, RelativeSource={RelativeSource AncestorType=Window}}"
                                                 CommandParameter="{Binding}">
                                             <Grid>
@@ -177,7 +205,7 @@
                                                 <TextBlock Text="{Binding Name}" FontWeight="Medium" />
                                                 <TextBlock Grid.Column="1"
                                                            Text="{Binding Version, StringFormat=v{0}}"
-                                                           Foreground="{StaticResource TextSecondaryBrush}"
+                                                           Foreground="{DynamicResource TextSecondaryBrush}"
                                                            FontSize="11"
                                                            Margin="8,0,0,0" />
                                             </Grid>
@@ -188,56 +216,76 @@
                         </ItemsControl>
 
                         <Button Content="{Binding BatchSelectedCount, StringFormat='Toplu release ({0})'}"
-                                Style="{StaticResource PrimaryButton}"
+                                Style="{DynamicResource PrimaryButton}"
                                 Command="{Binding CreateBatchReleaseCommand}"
                                 Margin="0,0,0,12" />
 
-                        <Separator Background="{StaticResource BorderBrush}" Margin="0,0,0,10" />
+                        <Separator Background="{DynamicResource BorderBrush}" Margin="0,0,0,10" />
 
-                        <TextBlock Text="ÇIKTI KLASÖRÜ"
+                        <TextBlock Text="{Binding Loc[output_folder]}"
                                    FontSize="11"
                                    FontWeight="SemiBold"
-                                   Foreground="{StaticResource TextSecondaryBrush}"
+                                   Foreground="{DynamicResource TextSecondaryBrush}"
                                    Margin="0,0,0,6" />
-                        <Button Content="Çıktı klasörü…"
+                        <Button Content="{Binding Loc[output_pick]}"
                                 Command="{Binding BrowseOutputFolderCommand}"
                                 Margin="0,0,0,6" />
                         <TextBlock Text="{Binding OutputFolder}"
                                    FontSize="10"
-                                   Foreground="{StaticResource TextSecondaryBrush}"
+                                   Foreground="{DynamicResource TextSecondaryBrush}"
                                    TextTrimming="CharacterEllipsis"
                                    Margin="0,0,0,12" />
 
-                        <TextBlock Text="GEÇMİŞ"
+                        <TextBlock Text="{Binding Loc[history]}"
                                    FontSize="11"
                                    FontWeight="SemiBold"
-                                   Foreground="{StaticResource TextSecondaryBrush}"
+                                   Foreground="{DynamicResource TextSecondaryBrush}"
                                    Margin="0,0,0,6" />
                         <ItemsControl ItemsSource="{Binding ReleaseHistory}"
                                       Visibility="{Binding HasHistory, Converter={StaticResource BoolToVisibility}}">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
-                                    <Button Style="{StaticResource ListItemButton}"
-                                            Command="{Binding DataContext.OpenHistoryEntryCommand, RelativeSource={RelativeSource AncestorType=Window}}"
-                                            CommandParameter="{Binding}"
-                                            Padding="8,6">
+                                    <Border Background="{DynamicResource TreeBgBrush}"
+                                            BorderBrush="{DynamicResource BorderBrush}"
+                                            BorderThickness="1"
+                                            CornerRadius="8"
+                                            Padding="8,6"
+                                            Margin="0,0,0,6">
                                         <StackPanel>
-                                            <TextBlock FontSize="12" FontWeight="Medium">
+                                            <TextBlock FontSize="12" FontWeight="Medium" Foreground="{DynamicResource TextPrimaryBrush}">
                                                 <Run Text="{Binding ResourceName}" />
                                                 <Run Text=" v" />
                                                 <Run Text="{Binding Version}" />
                                             </TextBlock>
-                                            <TextBlock Text="{Binding CreatedAt, StringFormat={}{0:dd.MM.yyyy HH:mm}}"
-                                                       FontSize="10"
-                                                       Foreground="{StaticResource TextSecondaryBrush}" />
+                                            <TextBlock FontSize="10" Foreground="{DynamicResource TextSecondaryBrush}">
+                                                <Run Text="{Binding CreatedAt, StringFormat={}{0:dd.MM.yyyy HH:mm}}" />
+                                                <Run Text=" · " />
+                                                <Run Text="{Binding EscrowBytes, Converter={StaticResource BytesToMb}}" />
+                                            </TextBlock>
+                                            <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
+                                                <Button Content="Klasör"
+                                                        Style="{DynamicResource SmallButton}"
+                                                        Command="{Binding DataContext.OpenHistoryEntryCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                        CommandParameter="{Binding}"
+                                                        Margin="0,0,4,0" />
+                                                <Button Content="Karşılaştır"
+                                                        Style="{DynamicResource SmallButton}"
+                                                        Command="{Binding DataContext.CompareHistoryEntryCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                        CommandParameter="{Binding}"
+                                                        Margin="0,0,4,0" />
+                                                <Button Content="Yol"
+                                                        Style="{DynamicResource SmallButton}"
+                                                        Command="{Binding DataContext.CopyHistoryPathCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                        CommandParameter="{Binding}" />
+                                            </StackPanel>
                                         </StackPanel>
-                                    </Button>
+                                    </Border>
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>
                         </ItemsControl>
-                        <TextBlock Text="Henüz release yok"
+                        <TextBlock Text="{Binding Loc[no_history]}"
                                    FontSize="11"
-                                   Foreground="{StaticResource TextSecondaryBrush}"
+                                   Foreground="{DynamicResource TextSecondaryBrush}"
                                    Visibility="{Binding HasHistory, Converter={StaticResource BoolToVisibility}, ConverterParameter=invert}" />
                     </StackPanel>
                 </ScrollViewer>
@@ -245,20 +293,35 @@
 
             <!-- Sağ panel -->
             <Border Grid.Column="2"
-                    Background="{StaticResource PanelBrush}"
-                    BorderBrush="{StaticResource BorderBrush}"
+                    Background="{DynamicResource PanelBrush}"
+                    BorderBrush="{DynamicResource BorderBrush}"
                     BorderThickness="1"
                     CornerRadius="12"
                     Padding="18">
                 <Grid>
-                    <StackPanel VerticalAlignment="Center"
-                                HorizontalAlignment="Center"
-                                Visibility="{Binding HasSelectedResource, Converter={StaticResource BoolToVisibility}, ConverterParameter=invert}">
-                        <TextBlock Text="Resources klasörünü seçin veya sürükleyip bırakın"
-                                   Foreground="{StaticResource TextSecondaryBrush}"
-                                   HorizontalAlignment="Center"
-                                   Margin="0,4" />
-                    </StackPanel>
+                    <!-- Boş durum / drop-zone -->
+                    <Border BorderBrush="{DynamicResource BorderBrush}"
+                            BorderThickness="2"
+                            CornerRadius="14"
+                            Margin="10"
+                            Background="{DynamicResource TreeBgBrush}"
+                            Visibility="{Binding HasSelectedResource, Converter={StaticResource BoolToVisibility}, ConverterParameter=invert}">
+                        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                            <TextBlock Text="📦"
+                                       FontSize="52"
+                                       HorizontalAlignment="Center"
+                                       Opacity="0.5" />
+                            <TextBlock Text="{Binding Loc[empty_hint]}"
+                                       Foreground="{DynamicResource TextSecondaryBrush}"
+                                       HorizontalAlignment="Center"
+                                       TextAlignment="Center"
+                                       Margin="0,12,0,0" />
+                            <Button Content="{Binding Loc[pick_folder]}"
+                                    Command="{Binding BrowseResourcesFolderCommand}"
+                                    HorizontalAlignment="Center"
+                                    Margin="0,14,0,0" />
+                        </StackPanel>
+                    </Border>
 
                     <ScrollViewer VerticalScrollBarVisibility="Auto"
                                   Visibility="{Binding HasSelectedResource, Converter={StaticResource BoolToVisibility}}">
@@ -272,32 +335,32 @@
                                     <TextBlock Text="{Binding SelectedResourceName}"
                                                FontSize="20"
                                                FontWeight="SemiBold"
-                                               Foreground="{StaticResource TextPrimaryBrush}" />
-                                    <TextBlock FontSize="12" Foreground="{StaticResource TextSecondaryBrush}">
+                                               Foreground="{DynamicResource TextPrimaryBrush}" />
+                                    <TextBlock FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}">
                                         <Run Text="Manifest:" />
                                         <Run Text="{Binding ManifestFileName}" />
                                     </TextBlock>
                                 </StackPanel>
                                 <Border Grid.Column="1"
-                                        Background="{StaticResource VersionBgBrush}"
-                                        BorderBrush="{StaticResource VersionBorderBrush}"
+                                        Background="{DynamicResource VersionBgBrush}"
+                                        BorderBrush="{DynamicResource VersionBorderBrush}"
                                         BorderThickness="1"
                                         CornerRadius="8"
                                         Padding="12,6">
                                     <TextBlock Text="{Binding CurrentVersion, StringFormat=v{0}}"
                                                FontWeight="SemiBold"
-                                               Foreground="{StaticResource VersionTextBrush}" />
+                                               Foreground="{DynamicResource VersionTextBrush}" />
                                 </Border>
                             </Grid>
 
-                            <Border Background="{StaticResource WarningBgBrush}"
+                            <Border Background="{DynamicResource WarningBgBrush}"
                                     CornerRadius="8"
                                     Padding="10"
                                     Margin="0,0,0,10"
                                     Visibility="{Binding HasManifestWarnings, Converter={StaticResource BoolToVisibility}}">
                                 <TextBlock Text="{Binding ManifestWarnings}"
                                            TextWrapping="Wrap"
-                                           Foreground="{StaticResource WarningTextBrush}"
+                                           Foreground="{DynamicResource WarningTextBrush}"
                                            FontSize="11" />
                             </Border>
 
@@ -305,21 +368,88 @@
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*" />
                                     <ColumnDefinition Width="10" />
-                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="10" />
+                                    <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
                                 <Button Grid.Column="0"
-                                        Style="{StaticResource PrimaryButton}"
-                                        Content="Release oluştur"
-                                        Command="{Binding CreateReleaseCommand}" />
-                                <Button Grid.Column="2"
-                                        Content="Sürüm artır"
-                                        Command="{Binding BumpPatchCommand}" />
+                                        Style="{DynamicResource PrimaryButton}"
+                                        Command="{Binding CreateReleaseCommand}"
+                                        Visibility="{Binding IsReleasing, Converter={StaticResource BoolToVisibility}, ConverterParameter=invert}">
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="🚀" Margin="0,0,6,0" />
+                                        <TextBlock Text="{Binding Loc[release_create]}" />
+                                    </StackPanel>
+                                </Button>
+                                <Button Grid.Column="0"
+                                        Command="{Binding CancelReleaseCommand}"
+                                        Background="#DC2626"
+                                        Foreground="White"
+                                        BorderBrush="#DC2626"
+                                        Visibility="{Binding IsReleasing, Converter={StaticResource BoolToVisibility}}">
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="⏹" Margin="0,0,6,0" />
+                                        <TextBlock Text="{Binding Loc[release_cancel]}" />
+                                    </StackPanel>
+                                </Button>
+                                <ToggleButton x:Name="ToolsButton"
+                                              Grid.Column="2"
+                                              Style="{DynamicResource ToolsToggle}">
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="🧰" Margin="0,0,5,0" />
+                                        <TextBlock Text="{Binding Loc[tools]}" />
+                                        <TextBlock Text=" ▾" />
+                                    </StackPanel>
+                                </ToggleButton>
+                                <Button Grid.Column="4"
+                                        Command="{Binding BumpPatchCommand}">
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="⬆" Margin="0,0,6,0" />
+                                        <TextBlock Text="{Binding Loc[bump_version]}" />
+                                    </StackPanel>
+                                </Button>
+
+                                <Popup PlacementTarget="{Binding ElementName=ToolsButton}"
+                                       Placement="Bottom"
+                                       StaysOpen="False"
+                                       AllowsTransparency="True"
+                                       IsOpen="{Binding IsChecked, ElementName=ToolsButton}">
+                                    <Border Background="{DynamicResource PanelBrush}"
+                                            BorderBrush="{DynamicResource BorderBrush}"
+                                            BorderThickness="1"
+                                            CornerRadius="10"
+                                            Margin="0,6,0,0"
+                                            Padding="6"
+                                            MinWidth="220">
+                                        <Border.Effect>
+                                            <DropShadowEffect BlurRadius="16" ShadowDepth="2" Opacity="0.2" />
+                                        </Border.Effect>
+                                        <StackPanel>
+                                            <Button Style="{DynamicResource ToolMenuItem}" Content="🔎  Escrow özeti" Command="{Binding PreviewEscrowSummaryCommand}" />
+                                            <Button Style="{DynamicResource ToolMenuItem}" Content="✅  Ön kontrol" Command="{Binding PreflightCommand}" />
+                                            <Button Style="{DynamicResource ToolMenuItem}" Content="🛡  Güvenlik taraması" Command="{Binding SecurityScanCommand}" />
+                                            <Separator Background="{DynamicResource BorderBrush}" Margin="4,4" />
+                                            <Button Style="{DynamicResource ToolMenuItem}" Content="📜  fxmanifest düzenle" Command="{Binding EditFxManifestCommand}" />
+                                            <Button Style="{DynamicResource ToolMenuItem}" Content="📝  CHANGELOG düzenle" Command="{Binding EditChangelogCommand}" />
+                                            <Button Style="{DynamicResource ToolMenuItem}" Content="🧹  Manifest lint" Command="{Binding LintManifestCommand}" />
+                                            <Button Style="{DynamicResource ToolMenuItem}" Content="👁  Manifest önizle" Command="{Binding PreviewManifestCommand}" />
+                                            <Button Style="{DynamicResource ToolMenuItem}" Content="🚫  release.ignore" Command="{Binding EditReleaseIgnoreCommand}" />
+                                            <Separator Background="{DynamicResource BorderBrush}" Margin="4,4" />
+                                            <Button Style="{DynamicResource ToolMenuItem}" Content="🔬  ZIP doğrula" Command="{Binding VerifyLastZipsCommand}" />
+                                            <Button Style="{DynamicResource ToolMenuItem}" Content="🔀  Karşılaştır" Command="{Binding CompareWithPreviousReleaseCommand}" />
+                                            <Separator Background="{DynamicResource BorderBrush}" Margin="4,4" />
+                                            <Button Style="{DynamicResource ToolMenuItem}" Content="📤  Profil dışa aktar" Command="{Binding ExportEscrowProfileCommand}" />
+                                            <Button Style="{DynamicResource ToolMenuItem}" Content="📥  Profil içe aktar" Command="{Binding ImportEscrowProfileCommand}" />
+                                            <Button Style="{DynamicResource ToolMenuItem}" Content="🔐  Portal oturum yenile" Command="{Binding RefreshPortalSessionCommand}" />
+                                        </StackPanel>
+                                    </Border>
+                                </Popup>
                             </Grid>
 
                             <Grid Margin="0,0,0,8">
-                                <CheckBox Content="Release'te sürüm artır"
+                                <CheckBox Content="{Binding Loc[bump_on_release]}"
                                           IsChecked="{Binding BumpOnRelease}"
-                                          Foreground="{StaticResource TextSecondaryBrush}" />
+                                          Foreground="{DynamicResource TextSecondaryBrush}" />
                             </Grid>
                             <ComboBox ItemsSource="{Binding VersionBumpOptions}"
                                       SelectedItem="{Binding SelectedVersionBump}"
@@ -331,64 +461,26 @@
                                      ToolTip="Örn: 2.1.0-beta"
                                      Visibility="{Binding ShowManualVersion, Converter={StaticResource BoolToVisibility}}" />
 
-                            <ProgressBar Value="{Binding ProgressPercent}"
-                                         Maximum="100"
-                                         Height="6"
-                                         Margin="0,0,0,10"
-                                         Visibility="{Binding ShowProgress, Converter={StaticResource BoolToVisibility}}" />
-
-                            <WrapPanel Margin="0,0,0,10">
-                                <Button Content="Escrow özeti"
-                                        Style="{StaticResource SmallButton}"
-                                        Command="{Binding PreviewEscrowSummaryCommand}"
-                                        Margin="0,0,6,6" />
-                                <Button Content="fxmanifest"
-                                        Style="{StaticResource SmallButton}"
-                                        Command="{Binding EditFxManifestCommand}"
-                                        Margin="0,0,6,6" />
-                                <Button Content="CHANGELOG"
-                                        Style="{StaticResource SmallButton}"
-                                        Command="{Binding EditChangelogCommand}"
-                                        Margin="0,0,6,6" />
-                                <Button Content="Manifest lint"
-                                        Style="{StaticResource SmallButton}"
-                                        Command="{Binding LintManifestCommand}"
-                                        Margin="0,0,6,6" />
-                                <Button Content="ZIP doğrula"
-                                        Style="{StaticResource SmallButton}"
-                                        Command="{Binding VerifyLastZipsCommand}"
-                                        Margin="0,0,6,6" />
-                                <Button Content="Karşılaştır"
-                                        Style="{StaticResource SmallButton}"
-                                        Command="{Binding CompareWithPreviousReleaseCommand}"
-                                        Margin="0,0,6,6" />
-                                <Button Content="Profil dışa"
-                                        Style="{StaticResource SmallButton}"
-                                        Command="{Binding ExportEscrowProfileCommand}"
-                                        Margin="0,0,6,6" />
-                                <Button Content="Profil içe"
-                                        Style="{StaticResource SmallButton}"
-                                        Command="{Binding ImportEscrowProfileCommand}"
-                                        Margin="0,0,6,6" />
-                                <Button Content="Portal oturum"
-                                        Style="{StaticResource SmallButton}"
-                                        Command="{Binding RefreshPortalSessionCommand}"
-                                        Margin="0,0,6,6" />
-                            </WrapPanel>
-
-                            <WrapPanel Margin="0,0,0,10">
-                                <Button Content="Manifest önizle"
-                                        Style="{StaticResource SmallButton}"
-                                        Command="{Binding PreviewManifestCommand}"
-                                        Margin="0,0,6,6" />
-                                <Button Content="release.ignore"
-                                        Style="{StaticResource SmallButton}"
-                                        Command="{Binding EditReleaseIgnoreCommand}"
-                                        Margin="0,0,6,6" />
-                            </WrapPanel>
+                            <Grid Margin="0,0,0,10"
+                                  Visibility="{Binding ShowProgress, Converter={StaticResource BoolToVisibility}}">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <ProgressBar Value="{Binding ProgressPercent}"
+                                             Maximum="100"
+                                             Height="6"
+                                             VerticalAlignment="Center" />
+                                <TextBlock Grid.Column="1"
+                                           Text="{Binding ProgressPercent, StringFormat={}{0}%}"
+                                           FontSize="11"
+                                           Foreground="{DynamicResource TextSecondaryBrush}"
+                                           Margin="8,0,0,0"
+                                           VerticalAlignment="Center" />
+                            </Grid>
 
                             <TextBlock Text="{Binding StatusText}"
-                                       Foreground="{StaticResource AccentBrush}"
+                                       Foreground="{DynamicResource AccentBrush}"
                                        FontSize="12"
                                        Margin="0,0,0,8"
                                        Visibility="{Binding StatusText, Converter={StaticResource NullToVisibility}}" />
@@ -405,12 +497,12 @@
                                     <DataTemplate>
                                         <StackPanel Orientation="Horizontal" Margin="0,0,8,6">
                                             <Button Content="{Binding Mode, Converter={StaticResource ModeToLabel}}"
-                                                    Style="{StaticResource SmallButton}"
+                                                    Style="{DynamicResource SmallButton}"
                                                     Command="{Binding DataContext.OpenZipCommand, RelativeSource={RelativeSource AncestorType=Window}}"
                                                     CommandParameter="{Binding}"
                                                     Margin="0,0,4,0" />
                                             <Button Content="Klasör"
-                                                    Style="{StaticResource SmallButton}"
+                                                    Style="{DynamicResource SmallButton}"
                                                     Command="{Binding DataContext.ShowZipFolderCommand, RelativeSource={RelativeSource AncestorType=Window}}"
                                                     CommandParameter="{Binding}" />
                                         </StackPanel>
@@ -418,55 +510,75 @@
                                 </ItemsControl.ItemTemplate>
                             </ItemsControl>
 
-                            <Separator Background="{StaticResource BorderBrush}" Margin="0,4,0,12" />
+                            <Separator Background="{DynamicResource BorderBrush}" Margin="0,4,0,12" />
 
                             <Grid Margin="0,0,0,8">
-                                <TextBlock VerticalAlignment="Center" Foreground="{StaticResource TextSecondaryBrush}">
-                                    <Run Text="Escrow dosyaları —" />
-                                    <Run Text="{Binding SelectedEscrowCount}" FontWeight="SemiBold" />
-                                    <Run Text="seçili" />
+                                <TextBlock VerticalAlignment="Center" Foreground="{DynamicResource TextSecondaryBrush}">
+                                    <Run Text="{Binding Loc[escrow_files], Mode=OneWay}" />
+                                    <Run Text=" —" />
+                                    <Run Text="{Binding SelectedEscrowCount, Mode=OneWay}" FontWeight="SemiBold" />
+                                    <Run Text="{Binding Loc[selected], Mode=OneWay}" />
                                 </TextBlock>
                             </Grid>
 
+                            <!-- Preset satırı -->
+                            <Grid Margin="0,0,0,8">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="8" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <ComboBox ItemsSource="{Binding PresetNames}"
+                                          SelectedItem="{Binding SelectedPresetName}"
+                                          Padding="8,5"
+                                          IsEditable="False"
+                                          ToolTip="Kayıtlı escrow preset uygula" />
+                                <Button Grid.Column="2"
+                                        Style="{DynamicResource SmallButton}"
+                                        Command="{Binding SavePresetCommand}"
+                                        Content="💾 Preset kaydet" />
+                            </Grid>
+
                             <WrapPanel Margin="0,0,0,8">
-                                <Button Content="Tüm .lua"
-                                        Style="{StaticResource SmallButton}"
+                                <Button Content="{Binding Loc[all_lua]}"
+                                        Style="{DynamicResource SmallButton}"
                                         Command="{Binding SelectAllLuaCommand}"
                                         Margin="0,0,6,6" />
-                                <Button Content="Tümünü seç"
-                                        Style="{StaticResource SmallButton}"
+                                <Button Content="{Binding Loc[select_all]}"
+                                        Style="{DynamicResource SmallButton}"
                                         Command="{Binding SelectAllFilesCommand}"
                                         Margin="0,0,6,6" />
-                                <Button Content="Temizle"
-                                        Style="{StaticResource SmallButton}"
+                                <Button Content="{Binding Loc[clear]}"
+                                        Style="{DynamicResource SmallButton}"
                                         Command="{Binding ClearSelectionCommand}"
                                         Margin="0,0,6,6" />
-                                <Button Content="Sadece otomatik"
-                                        Style="{StaticResource SmallButton}"
+                                <Button Content="{Binding Loc[only_auto]}"
+                                        Style="{DynamicResource SmallButton}"
                                         Command="{Binding KeepOnlyAutoSuggestedCommand}"
                                         Margin="0,0,6,6" />
                             </WrapPanel>
 
-                            <TextBox Text="{Binding FileTreeFilter, UpdateSourceTrigger=PropertyChanged}"
+                            <TextBox x:Name="FileFilterBox"
+                                     Text="{Binding FileTreeFilter, UpdateSourceTrigger=PropertyChanged}"
                                      Margin="0,0,0,8"
                                      Padding="8,6"
                                      FontSize="12"
-                                     Background="{StaticResource TreeBgBrush}"
-                                     Foreground="{StaticResource TextPrimaryBrush}"
-                                     BorderBrush="{StaticResource BorderBrush}"
-                                     ToolTip="Dosya ağacında ara (config, shared…)" />
+                                     Background="{DynamicResource TreeBgBrush}"
+                                     Foreground="{DynamicResource TextPrimaryBrush}"
+                                     BorderBrush="{DynamicResource BorderBrush}"
+                                     ToolTip="{Binding Loc[filter_tree]}" />
 
-                            <Border Background="{StaticResource TreeBgBrush}"
-                                    BorderBrush="{StaticResource BorderBrush}"
+                            <Border Background="{DynamicResource TreeBgBrush}"
+                                    BorderBrush="{DynamicResource BorderBrush}"
                                     BorderThickness="1"
                                     CornerRadius="10"
                                     Padding="8"
                                     MinHeight="240">
                                 <Grid>
-                                    <TextBlock Text="Dosyalar okunuyor…"
+                                    <TextBlock Text="{Binding Loc[reading_files]}"
                                                HorizontalAlignment="Center"
                                                VerticalAlignment="Center"
-                                               Foreground="{StaticResource TextSecondaryBrush}"
+                                               Foreground="{DynamicResource TextSecondaryBrush}"
                                                Visibility="{Binding IsBusy, Converter={StaticResource BoolToVisibility}}" />
                                     <ScrollViewer VerticalScrollBarVisibility="Auto"
                                                   MaxHeight="420"
@@ -486,5 +598,50 @@
                 </Grid>
             </Border>
         </Grid>
+
+        <!-- Toast bildirimleri -->
+        <ItemsControl ItemsSource="{Binding Toasts}"
+                      Grid.Row="0"
+                      Grid.RowSpan="2"
+                      HorizontalAlignment="Right"
+                      VerticalAlignment="Bottom"
+                      Margin="0,0,8,8">
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <Border Background="{DynamicResource PanelBrush}"
+                            BorderBrush="{Binding Kind, Converter={StaticResource ToastKindToBrush}}"
+                            BorderThickness="1,1,1,3"
+                            CornerRadius="10"
+                            Padding="14,10"
+                            Margin="0,8,0,0"
+                            MinWidth="240"
+                            MaxWidth="380">
+                        <Border.Effect>
+                            <DropShadowEffect BlurRadius="18" ShadowDepth="3" Opacity="0.22" />
+                        </Border.Effect>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="{Binding Message}"
+                                       TextWrapping="Wrap"
+                                       VerticalAlignment="Center"
+                                       Foreground="{DynamicResource TextPrimaryBrush}"
+                                       FontSize="12" />
+                            <Button Grid.Column="1"
+                                    Content="✕"
+                                    Style="{DynamicResource ListItemButton}"
+                                    Padding="6,2"
+                                    Margin="8,0,0,0"
+                                    FontSize="11"
+                                    Foreground="{DynamicResource TextSecondaryBrush}"
+                                    Command="{Binding DataContext.DismissToastCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                    CommandParameter="{Binding}" />
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
     </Grid>
 </Window>

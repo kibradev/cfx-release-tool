@@ -4,6 +4,7 @@ using Microsoft.Win32;
 using ReleaseTool.Desktop.Models;
 using ReleaseTool.Desktop.Services;
 using ReleaseTool.Desktop.Views;
+using LocSvc = ReleaseTool.Desktop.Services.Loc;
 
 namespace ReleaseTool.Desktop.ViewModels;
 
@@ -75,7 +76,7 @@ public partial class MainViewModel
 
         var config = _configService.Load();
         var summary = ReleasePreviewService.Build(_selectedResource.Path, GetSelectedEscrowPaths(), config);
-        TextEditorDialog.ShowPreview(Loc.Get("preview_escrow"), ReleasePreviewService.FormatSummary(summary));
+        TextEditorDialog.ShowPreview(LocSvc.Get("preview_escrow"), ReleasePreviewService.FormatSummary(summary));
     }
 
     [RelayCommand]
@@ -86,7 +87,7 @@ public partial class MainViewModel
 
         var path = Path.Combine(_selectedResource.Path, ManifestFileName);
         var content = File.ReadAllText(path);
-        if (TextEditorDialog.ShowEdit(Loc.Get("edit_manifest"), ref content) != true)
+        if (TextEditorDialog.ShowEdit(LocSvc.Get("edit_manifest"), ref content) != true)
             return;
 
         File.WriteAllText(path, content);
@@ -106,7 +107,7 @@ public partial class MainViewModel
             ? File.ReadAllText(path)
             : "# Changelog\n\n## v1.0.0\n- Initial release\n";
 
-        if (TextEditorDialog.ShowEdit(Loc.Get("edit_changelog"), ref content) != true)
+        if (TextEditorDialog.ShowEdit(LocSvc.Get("edit_changelog"), ref content) != true)
             return;
 
         File.WriteAllText(path, content);
@@ -138,7 +139,7 @@ public partial class MainViewModel
             var (ok, msg) = ZipVerifyService.Verify(z.ZipPath);
             return $"{z.ZipName}: {(ok ? "OK" : "HATA")} — {msg}";
         });
-        TextEditorDialog.ShowPreview(Loc.Get("verify_zip"), string.Join(Environment.NewLine, lines));
+        TextEditorDialog.ShowPreview(LocSvc.Get("verify_zip"), string.Join(Environment.NewLine, lines));
     }
 
     [RelayCommand]
@@ -153,7 +154,7 @@ public partial class MainViewModel
 
         var prev = _orchestrator.FindPreviousEscrowZip(_selectedResource.Name, escrow.ZipPath);
         var diff = ReleaseDiffService.CompareWithPrevious(prev, escrow.ZipPath);
-        TextEditorDialog.ShowPreview(Loc.Get("compare_release"), diff);
+        TextEditorDialog.ShowPreview(LocSvc.Get("compare_release"), diff);
     }
 
     [RelayCommand]
@@ -208,6 +209,118 @@ public partial class MainViewModel
         var config = _configService.Load();
         config.Language = config.Language.Equals("en", StringComparison.OrdinalIgnoreCase) ? "tr" : "en";
         _configService.Save(config);
+        LocSvc.Instance.SetLanguage(config.Language);
         StatusText = config.Language == "en" ? "Language: English" : "Dil: Türkçe";
+    }
+
+    [RelayCommand]
+    private void SecurityScan()
+    {
+        if (_selectedResource == null)
+            return;
+
+        var config = _configService.Load();
+        var allFiles = Directory
+            .EnumerateFiles(_selectedResource.Path, "*", SearchOption.AllDirectories)
+            .Select(f => Path.GetRelativePath(_selectedResource.Path, f).Replace('\\', '/'))
+            .Where(f => !ExcludeHelper.ShouldExclude(f, config.Exclude)
+                     && !ExcludeHelper.ShouldExclude(f, config.EscrowZipExtraExcludes))
+            .ToList();
+
+        var warnings = SecurityScanService.ScanResource(_selectedResource.Path, allFiles, config.PortalMaxZipMb);
+
+        var text = warnings.Count == 0
+            ? "Güvenlik taraması temiz ✓\n\nHassas dosya adı, olası gizli anahtar veya boyut sorunu bulunamadı."
+            : "Bulgular:\n" + string.Join(Environment.NewLine, warnings.Select(w => "- " + w));
+
+        TextEditorDialog.ShowPreview(LocSvc.Get("security_scan"), text);
+        ShowToast(
+            warnings.Count == 0 ? "Güvenlik taraması temiz" : $"{warnings.Count} güvenlik bulgusu",
+            warnings.Count == 0 ? ToastKind.Success : ToastKind.Warning);
+    }
+
+    [RelayCommand]
+    private void Preflight()
+    {
+        if (_selectedResource == null)
+            return;
+
+        var config = _configService.Load();
+        var paths = GetSelectedEscrowPaths();
+        var summary = ReleasePreviewService.Build(_selectedResource.Path, paths, config);
+        var lint = ManifestLintService.Lint(_manifestContent, ManifestFileName);
+        var analysis = ManifestAnalyzerService.Analyze(_selectedResource.Path, _manifestContent, config);
+        var analysisWarnings = BuildWarningsText(analysis)
+            .Split('\n', StringSplitOptions.RemoveEmptyEntries);
+
+        static string Mark(bool ok) => ok ? "✓" : "✗";
+
+        var lines = new List<string>
+        {
+            $"Ön kontrol — {_selectedResource.Name} v{CurrentVersion}",
+            new string('─', 40),
+            $"{Mark(summary.EscrowedFiles > 0)} Escrow'da kalacak dosya: {summary.EscrowedFiles}",
+            $"{Mark(true)} Açık (escrow_ignore) dosya: {summary.OpenFiles}",
+            $"   Tahmini escrow: {summary.EstimatedEscrowBytes / (1024.0 * 1024.0):F2} MB · OS: {summary.EstimatedOsBytes / (1024.0 * 1024.0):F2} MB",
+            $"{Mark(lint.Count == 0)} Manifest lint: {(lint.Count == 0 ? "sorun yok" : lint.Count + " sorun")}",
+            $"{Mark(analysisWarnings.Length == 0)} Manifest analizi: {(analysisWarnings.Length == 0 ? "temiz" : analysisWarnings.Length + " uyarı")}",
+            $"{Mark(summary.Warnings.Count == 0)} Güvenlik/boyut: {(summary.Warnings.Count == 0 ? "temiz" : summary.Warnings.Count + " bulgu")}",
+            ""
+        };
+
+        void AddSection(string title, IEnumerable<string> items)
+        {
+            var list = items.ToList();
+            if (list.Count == 0)
+                return;
+            lines.Add(title);
+            lines.AddRange(list.Select(i => "  - " + i));
+            lines.Add("");
+        }
+
+        AddSection("Lint:", lint);
+        AddSection("Analiz:", analysisWarnings);
+        AddSection("Güvenlik/boyut:", summary.Warnings);
+
+        var clean = lint.Count == 0 && analysisWarnings.Length == 0 && summary.Warnings.Count == 0;
+        lines.Add(clean ? "Sonuç: Release'e hazır ✓" : "Sonuç: Yukarıdaki uyarıları gözden geçirin.");
+
+        TextEditorDialog.ShowPreview(LocSvc.Get("preflight"), string.Join(Environment.NewLine, lines));
+        ShowToast(clean ? "Ön kontrol temiz" : "Ön kontrolde uyarılar var",
+            clean ? ToastKind.Success : ToastKind.Warning);
+    }
+
+    [RelayCommand]
+    private void CompareHistoryEntry(ReleaseHistoryEntry? entry)
+    {
+        if (entry == null || string.IsNullOrEmpty(entry.EscrowZipPath))
+            return;
+
+        var prev = _orchestrator.FindPreviousEscrowZip(entry.ResourceName, entry.EscrowZipPath);
+        if (prev == null || !File.Exists(entry.EscrowZipPath))
+        {
+            ShowToast("Karşılaştırılacak önceki release yok", ToastKind.Info);
+            return;
+        }
+
+        var diff = ReleaseDiffService.CompareWithPrevious(prev, entry.EscrowZipPath);
+        TextEditorDialog.ShowPreview($"{entry.ResourceName} v{entry.Version} — {LocSvc.Get("compare_release")}", diff);
+    }
+
+    [RelayCommand]
+    private void CopyHistoryPath(ReleaseHistoryEntry? entry)
+    {
+        if (entry == null || string.IsNullOrEmpty(entry.EscrowZipPath))
+            return;
+
+        try
+        {
+            Clipboard.SetText(entry.EscrowZipPath);
+            ShowToast("ZIP yolu kopyalandı", ToastKind.Success);
+        }
+        catch
+        {
+            ShowToast("Panoya kopyalanamadı", ToastKind.Error);
+        }
     }
 }

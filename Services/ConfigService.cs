@@ -10,7 +10,8 @@ public sealed class ConfigService
     {
         WriteIndented = true,
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
+        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+        NumberHandling = JsonNumberHandling.AllowNamedFloatingPointLiterals
     };
 
     private readonly string _appDataConfigPath;

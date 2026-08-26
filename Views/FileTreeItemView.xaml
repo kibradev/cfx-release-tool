@@ -35,7 +35,7 @@
                 <TextBlock x:Name="Chevron"
                            Text="▶"
                            FontSize="9"
-                           Foreground="#78716C"
+                           Foreground="{DynamicResource TextSecondaryBrush}"
                            HorizontalAlignment="Center"
                            VerticalAlignment="Center"
                            RenderTransformOrigin="0.5,0.5">
@@ -83,19 +83,34 @@
                         </Style>
                     </TextBlock.Style>
                 </TextBlock>
+                <TextBlock Text="{Binding Path, Converter={StaticResource PathToIcon}}"
+                           FontSize="12"
+                           Margin="0,0,4,0"
+                           VerticalAlignment="Center">
+                    <TextBlock.Style>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="Visibility" Value="Visible" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsDirectory}" Value="True">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBlock.Style>
+                </TextBlock>
                 <TextBlock VerticalAlignment="Center"
                            Text="{Binding Name}"
                            ToolTip="{Binding Path}">
                     <TextBlock.Style>
                         <Style TargetType="TextBlock">
-                            <Setter Property="Foreground" Value="#44403C" />
+                            <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
                             <Setter Property="FontWeight" Value="Normal" />
                             <Style.Triggers>
                                 <DataTrigger Binding="{Binding IsDirectory}" Value="True">
                                     <Setter Property="FontWeight" Value="SemiBold" />
                                 </DataTrigger>
                                 <DataTrigger Binding="{Binding IsAutoSuggested}" Value="True">
-                                    <Setter Property="Foreground" Value="#047857" />
+                                    <Setter Property="Foreground" Value="{DynamicResource AccentBrush}" />
                                 </DataTrigger>
                             </Style.Triggers>
                         </Style>
@@ -103,7 +118,7 @@
                 </TextBlock>
                 <TextBlock Text="auto"
                            FontSize="9"
-                           Foreground="#047857"
+                           Foreground="{DynamicResource AccentBrush}"
                            Margin="6,0,0,0"
                            VerticalAlignment="Center"
                            Opacity="0.85">

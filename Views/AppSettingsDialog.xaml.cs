@@ -25,6 +25,22 @@ public partial class AppSettingsDialog : Window
         CheckUpdatesBox.IsChecked = _config.CheckForUpdates;
         AutoPortalBox.IsChecked = _config.AutoUploadPortal;
         VerifyZipBox.IsChecked = _config.VerifyZipAfterRelease;
+
+        FollowSystemThemeBox.IsChecked = _config.FollowSystemTheme;
+        AccentBox.Items.Clear();
+        AccentBox.Items.Add(new ComboBoxItem { Content = "Varsayılan", Tag = "" });
+        foreach (var (name, hex) in ThemeService.AccentPresets)
+            AccentBox.Items.Add(new ComboBoxItem { Content = name, Tag = hex });
+        AccentBox.SelectedIndex = 0;
+        for (var i = 0; i < AccentBox.Items.Count; i++)
+        {
+            if (AccentBox.Items[i] is ComboBoxItem item &&
+                string.Equals(item.Tag?.ToString(), _config.AccentColor, StringComparison.OrdinalIgnoreCase))
+            {
+                AccentBox.SelectedIndex = i;
+                break;
+            }
+        }
         PortalMaxMbBox.Text = _config.PortalMaxZipMb.ToString();
         ExtraFoldersBox.Text = string.Join(Environment.NewLine, _config.ResourcesFolders);
 
@@ -58,6 +74,9 @@ public partial class AppSettingsDialog : Window
         _config.VerifyZipAfterRelease = VerifyZipBox.IsChecked == true;
         if (long.TryParse(PortalMaxMbBox.Text.Trim(), out var mb))
             _config.PortalMaxZipMb = mb;
+
+        _config.FollowSystemTheme = FollowSystemThemeBox.IsChecked == true;
+        _config.AccentColor = (AccentBox.SelectedItem as ComboBoxItem)?.Tag?.ToString() ?? "";
 
         _config.ResourcesFolders = SplitLines(ExtraFoldersBox.Text);
         _config.Exclude = SplitLines(ExcludeBox.Text);

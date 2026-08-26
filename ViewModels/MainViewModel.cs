@@ -1,12 +1,14 @@
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Windows;
+using System.Windows.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Win32;
 using ReleaseTool.Desktop.Models;
 using ReleaseTool.Desktop.Services;
 using ReleaseTool.Desktop.Views;
+using LocSvc = ReleaseTool.Desktop.Services.Loc;
 
 namespace ReleaseTool.Desktop.ViewModels;
 
@@ -23,6 +25,7 @@ public partial class MainViewModel : ObservableObject
     private bool _suppressTreeUpdates;
     private string _manifestContent = "";
     private HashSet<string> _autoSuggestedPaths = new(StringComparer.OrdinalIgnoreCase);
+    private CancellationTokenSource? _releaseCts;
 
     public ObservableCollection<VersionBumpOption> VersionBumpOptions { get; } =
     [
@@ -33,12 +36,15 @@ public partial class MainViewModel : ObservableObject
         new() { Kind = VersionBumpKind.Manual, Label = "Manuel sürüm" }
     ];
 
+    public LocSvc Loc => LocSvc.Instance;
+
     public MainViewModel()
     {
         _releaseService = new ReleaseService(_configService);
         SelectedVersionBump = VersionBumpOptions[0];
         LoadConfig();
         RefreshHistory();
+        RefreshPresets();
         _ = CheckUpdatesOnStartupAsync();
     }
 
@@ -114,6 +120,18 @@ public partial class MainViewModel : ObservableObject
     [ObservableProperty]
     private string? _selectedResourcesFolder;
 
+    [ObservableProperty]
+    private ObservableCollection<ToastItem> _toasts = [];
+
+    [ObservableProperty]
+    private bool _isReleasing;
+
+    [ObservableProperty]
+    private ObservableCollection<string> _presetNames = [];
+
+    [ObservableProperty]
+    private string? _selectedPresetName;
+
     public bool ShowManualVersion => SelectedVersionBump?.Kind == VersionBumpKind.Manual;
     public bool ShowProgress => ProgressPercent >= 0;
 
@@ -138,8 +156,8 @@ public partial class MainViewModel : ObservableObject
 
     partial void OnDarkThemeChanged(bool value)
     {
-        ThemeService.Apply(value);
         var config = _configService.Load();
+        ThemeService.Apply(value, config.AccentColor);
         config.DarkTheme = value;
         _configService.Save(config);
     }
@@ -160,9 +178,11 @@ public partial class MainViewModel : ObservableObject
         var config = _configService.Load();
         ResourcesFolder = config.ResourcesFolder;
         OutputFolder = _configService.GetOutputFolder(config);
-        DarkTheme = config.DarkTheme;
+        DarkTheme = config.FollowSystemTheme ? ThemeService.IsSystemDark() : config.DarkTheme;
         WatchEnabled = config.WatchResourcesFolder;
-        ThemeService.Apply(DarkTheme);
+        ThemeService.Apply(DarkTheme, config.AccentColor);
+        LocSvc.Instance.SetLanguage(config.Language);
+        RefreshPresets();
 
         ResourcesFolderList = new ObservableCollection<string>(
             new[] { config.ResourcesFolder }
@@ -207,6 +227,87 @@ public partial class MainViewModel : ObservableObject
         ReleaseHistory = new ObservableCollection<ReleaseHistoryEntry>(_historyService.Load());
     }
 
+    public void ShowToast(string message, ToastKind kind = ToastKind.Info)
+    {
+        if (string.IsNullOrWhiteSpace(message))
+            return;
+
+        var toast = new ToastItem { Message = message, Kind = kind };
+        Toasts.Add(toast);
+
+        var timer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(kind == ToastKind.Error ? 6 : 3.5) };
+        timer.Tick += (_, _) =>
+        {
+            timer.Stop();
+            Toasts.Remove(toast);
+        };
+        timer.Start();
+    }
+
+    [RelayCommand]
+    private void DismissToast(ToastItem? toast)
+    {
+        if (toast != null)
+            Toasts.Remove(toast);
+    }
+
+    private void RefreshPresets()
+    {
+        var config = _configService.Load();
+        PresetNames = new ObservableCollection<string>(config.EscrowPresets.Select(p => p.Name));
+    }
+
+    [RelayCommand]
+    private void SavePreset()
+    {
+        if (_selectedResource == null)
+            return;
+
+        var name = _selectedResource.Name;
+        if (!PromptText("Preset adı", ref name) || string.IsNullOrWhiteSpace(name))
+            return;
+
+        var config = _configService.Load();
+        var paths = GetSelectedEscrowPaths().ToList();
+        var existing = config.EscrowPresets.FirstOrDefault(p =>
+            string.Equals(p.Name, name, StringComparison.OrdinalIgnoreCase));
+        if (existing != null)
+            existing.Paths = paths;
+        else
+            config.EscrowPresets.Add(new EscrowPreset { Name = name.Trim(), Paths = paths });
+
+        _configService.Save(config);
+        RefreshPresets();
+        SelectedPresetName = name.Trim();
+        ShowToast($"Preset kaydedildi: {name} ({paths.Count} dosya)", ToastKind.Success);
+    }
+
+    partial void OnSelectedPresetNameChanged(string? value)
+    {
+        if (string.IsNullOrWhiteSpace(value) || _selectedResource == null)
+            return;
+
+        var config = _configService.Load();
+        var preset = config.EscrowPresets.FirstOrDefault(p =>
+            string.Equals(p.Name, value, StringComparison.OrdinalIgnoreCase));
+        if (preset == null)
+            return;
+
+        ApplyEscrowSelection(preset.Paths.ToHashSet(StringComparer.OrdinalIgnoreCase), _autoSuggestedPaths);
+        PersistCurrentSelection();
+        ShowToast($"Preset uygulandı: {value}", ToastKind.Info);
+    }
+
+    private static bool PromptText(string title, ref string value)
+    {
+        var input = value;
+        var result = TextEditorDialog.ShowEdit(title, ref input);
+        if (result != true)
+            return false;
+        value = input.Trim();
+        return true;
+    }
+
     public void SetResourcesFolderFromDrop(string path)
     {
         if (!Directory.Exists(path))
@@ -215,6 +316,33 @@ public partial class MainViewModel : ObservableObject
         ResourcesFolder = path;
         SaveConfig();
         RefreshResourcesList();
+    }
+
+    /// <summary>
+    /// Bırakılan klasör tek bir resource ise (fxmanifest içeriyorsa) üst klasörü
+    /// resources kökü yap ve o resource'u seç; değilse kökü ayarla.
+    /// </summary>
+    public void SetDroppedPath(string path)
+    {
+        if (!Directory.Exists(path))
+            return;
+
+        if (ManifestService.FindManifestPath(path) != null)
+        {
+            var parent = Directory.GetParent(path)?.FullName;
+            var name = new DirectoryInfo(path).Name;
+            if (!string.IsNullOrEmpty(parent))
+            {
+                ResourcesFolder = parent;
+                SaveConfig();
+                RefreshResourcesList(name);
+                ShowToast($"Resource açıldı: {name}", ToastKind.Success);
+                return;
+            }
+        }
+
+        SetResourcesFolderFromDrop(path);
+        ShowToast("Resources klasörü ayarlandı", ToastKind.Info);
     }
 
     [RelayCommand]
@@ -776,7 +904,11 @@ public partial class MainViewModel : ObservableObject
         if (!ConfirmReleaseWarnings())
             return;
 
+        _releaseCts = new CancellationTokenSource();
+        var ct = _releaseCts.Token;
+
         IsBusy = true;
+        IsReleasing = true;
         ProgressPercent = 0;
         StatusText = "Release oluşturuluyor…";
 
@@ -805,24 +937,42 @@ public partial class MainViewModel : ObservableObject
                 escrowPaths,
                 bump,
                 BuildPipelineOptions(),
-                progress);
+                progress,
+                ct);
 
             FinishRelease(_selectedResource, version, releases);
             RefreshResourcesList(_selectedResource.Name);
+            ShowToast($"{_selectedResource?.Name} v{version} hazır", ToastKind.Success);
 
             if (!_configService.Load().AutoUploadPortal)
                 await OfferPortalUploadAsync();
+        }
+        catch (OperationCanceledException)
+        {
+            StatusText = "Release iptal edildi";
+            ShowToast("Release iptal edildi", ToastKind.Warning);
         }
         catch (Exception ex)
         {
             MessageBox.Show(ex.Message, "Release oluşturulamadı", MessageBoxButton.OK, MessageBoxImage.Error);
             StatusText = "";
+            ShowToast("Release başarısız", ToastKind.Error);
         }
         finally
         {
             IsBusy = false;
+            IsReleasing = false;
             ProgressPercent = -1;
+            _releaseCts?.Dispose();
+            _releaseCts = null;
         }
+    }
+
+    [RelayCommand]
+    private void CancelRelease()
+    {
+        _releaseCts?.Cancel();
+        StatusText = "İptal ediliyor…";
     }
 
     [RelayCommand(CanExecute = nameof(CanRunBatchRelease))]

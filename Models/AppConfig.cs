@@ -52,4 +52,16 @@ public sealed class AppConfig
     public List<string> RecentResources { get; set; } = [];
     public bool CheckForUpdates { get; set; } = true;
     public string EscrowProfileName { get; set; } = "";
+
+    // UI / kişiselleştirme
+    public string AccentColor { get; set; } = "";
+    public bool FollowSystemTheme { get; set; }
+    public double WindowWidth { get; set; }
+    public double WindowHeight { get; set; }
+    public double? WindowLeft { get; set; }
+    public double? WindowTop { get; set; }
+    public double LeftPanelWidth { get; set; } = 280;
+
+    /// <summary>İsimli escrow seçim preset'leri (resource'tan bağımsız).</summary>
+    public List<EscrowPreset> EscrowPresets { get; set; } = [];
 }
