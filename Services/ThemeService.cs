@@ -1,11 +1,23 @@
 using System.Windows;
 using System.Windows.Media;
+using Microsoft.Win32;
 
 namespace ReleaseTool.Desktop.Services;
 
 public static class ThemeService
 {
-    public static void Apply(bool dark)
+    /// <summary>Kullanıcı seçebileceği hazır accent renkleri (ad → hex).</summary>
+    public static readonly (string Name, string Hex)[] AccentPresets =
+    [
+        ("Emerald", "#059669"),
+        ("Blue", "#2563EB"),
+        ("Violet", "#7C3AED"),
+        ("Rose", "#E11D48"),
+        ("Amber", "#D97706"),
+        ("Cyan", "#0891B2"),
+    ];
+
+    public static void Apply(bool dark, string? accentHex = null)
     {
         var app = Application.Current;
         if (app == null)
@@ -42,5 +54,29 @@ public static class ThemeService
             Set("VersionBorderBrush", "#A7F3D0");
             Set("VersionTextBrush", "#047857");
         }
+
+        if (!string.IsNullOrWhiteSpace(accentHex))
+        {
+            try { Set("AccentBrush", accentHex); }
+            catch { /* geçersiz hex — varsayılanı koru */ }
+        }
+    }
+
+    /// <summary>Windows kişiselleştirme ayarından koyu tema kullanılıyor mu?</summary>
+    public static bool IsSystemDark()
+    {
+        try
+        {
+            using var key = Registry.CurrentUser.OpenSubKey(
+                @"Software\Microsoft\Windows\CurrentVersion\Themes\Personalize");
+            var value = key?.GetValue("AppsUseLightTheme");
+            if (value is int i)
+                return i == 0;
+        }
+        catch
+        {
+            // registry okunamadı
+        }
+        return false;
     }
 }

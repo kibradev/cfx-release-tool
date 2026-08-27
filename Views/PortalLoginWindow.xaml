@@ -8,7 +8,7 @@
         MinWidth="700"
         MinHeight="500"
         WindowStartupLocation="CenterOwner"
-        Background="{StaticResource BgBrush}">
+        Background="{DynamicResource BgBrush}">
     <Grid Margin="12">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -21,16 +21,16 @@
             <TextBlock Text="Cfx.re Portal — tarayıcıdan giriş"
                        FontSize="16"
                        FontWeight="SemiBold"
-                       Foreground="{StaticResource TextPrimaryBrush}" />
+                       Foreground="{DynamicResource TextPrimaryBrush}" />
             <TextBlock Text="Aşağıdaki pencerede forum/portal hesabınla giriş yap. Sonra 'Oturumu kaydet'."
                        FontSize="12"
-                       Foreground="{StaticResource TextSecondaryBrush}"
+                       Foreground="{DynamicResource TextSecondaryBrush}"
                        TextWrapping="Wrap"
                        Margin="0,4,0,0" />
         </StackPanel>
 
         <Border Grid.Row="1"
-                BorderBrush="{StaticResource BorderBrush}"
+                BorderBrush="{DynamicResource BorderBrush}"
                 BorderThickness="1"
                 CornerRadius="8">
             <wv2:WebView2 x:Name="Browser" />
@@ -40,7 +40,7 @@
                    Grid.Row="2"
                    Margin="0,10,0,0"
                    FontSize="11"
-                   Foreground="{StaticResource AccentBrush}" />
+                   Foreground="{DynamicResource AccentBrush}" />
 
         <StackPanel Grid.Row="3"
                     Orientation="Horizontal"
@@ -48,7 +48,7 @@
                     Margin="0,12,0,0">
             <Button x:Name="SaveSessionButton"
                     Content="Oturumu kaydet"
-                    Style="{StaticResource PrimaryButton}"
+                    Style="{DynamicResource PrimaryButton}"
                     Click="SaveSessionButton_Click"
                     Padding="16,8"
                     Margin="0,0,8,0" />

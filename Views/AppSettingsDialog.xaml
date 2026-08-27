@@ -5,7 +5,7 @@
         Width="640"
         Height="560"
         WindowStartupLocation="CenterOwner"
-        Background="{StaticResource BgBrush}">
+        Background="{DynamicResource BgBrush}">
     <Grid Margin="16">
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
@@ -16,7 +16,7 @@
             <TabItem Header="Genel">
                 <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="8">
                     <StackPanel>
-                        <TextBlock Text="Dil" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,0,4" />
+                        <TextBlock Text="Dil" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,0,0,4" />
                         <ComboBox x:Name="LanguageBox" Margin="0,0,0,12" Padding="6">
                             <ComboBoxItem Content="Türkçe" Tag="tr" />
                             <ComboBoxItem Content="English" Tag="en" />
@@ -25,9 +25,14 @@
                         <CheckBox x:Name="CheckUpdatesBox" Content="Başlangıçta güncelleme kontrolü" Margin="0,0,0,8" />
                         <CheckBox x:Name="AutoPortalBox" Content="Release sonrası otomatik Portal upload" Margin="0,0,0,8" />
                         <CheckBox x:Name="VerifyZipBox" Content="Release sonrası ZIP doğrula" Margin="0,0,0,12" />
-                        <TextBlock Text="Portal max ZIP (MB)" Foreground="{StaticResource TextSecondaryBrush}" />
+
+                        <TextBlock Text="Görünüm" FontWeight="SemiBold" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,0,0,6" />
+                        <CheckBox x:Name="FollowSystemThemeBox" Content="Windows temasını takip et (açık/koyu)" Margin="0,0,0,8" />
+                        <TextBlock Text="Vurgu rengi (accent)" Foreground="{DynamicResource TextSecondaryBrush}" />
+                        <ComboBox x:Name="AccentBox" Margin="0,4,0,12" Padding="6" />
+                        <TextBlock Text="Portal max ZIP (MB)" Foreground="{DynamicResource TextSecondaryBrush}" />
                         <TextBox x:Name="PortalMaxMbBox" Margin="0,4,0,12" Padding="6" />
-                        <TextBlock Text="Ek resources klasörleri (satır başına bir)" Foreground="{StaticResource TextSecondaryBrush}" />
+                        <TextBlock Text="Ek resources klasörleri (satır başına bir)" Foreground="{DynamicResource TextSecondaryBrush}" />
                         <TextBox x:Name="ExtraFoldersBox" AcceptsReturn="True" Height="80" TextWrapping="Wrap" Margin="0,4,0,0" Padding="6" />
                     </StackPanel>
                 </ScrollViewer>
@@ -35,15 +40,15 @@
             <TabItem Header="Exclude / Escrow">
                 <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="8">
                     <StackPanel>
-                        <TextBlock Text="Exclude kuralları (satır başına)" Foreground="{StaticResource TextSecondaryBrush}" />
+                        <TextBlock Text="Exclude kuralları (satır başına)" Foreground="{DynamicResource TextSecondaryBrush}" />
                         <TextBox x:Name="ExcludeBox" AcceptsReturn="True" Height="100" TextWrapping="Wrap" Margin="0,4,0,12" Padding="6" FontFamily="Consolas" />
-                        <TextBlock Text="Escrow ZIP ek exclude" Foreground="{StaticResource TextSecondaryBrush}" />
+                        <TextBlock Text="Escrow ZIP ek exclude" Foreground="{DynamicResource TextSecondaryBrush}" />
                         <TextBox x:Name="EscrowExtraBox" AcceptsReturn="True" Height="80" TextWrapping="Wrap" Margin="0,4,0,12" Padding="6" FontFamily="Consolas" />
-                        <TextBlock Text="Web publish klasörü" Foreground="{StaticResource TextSecondaryBrush}" />
+                        <TextBlock Text="Web publish klasörü" Foreground="{DynamicResource TextSecondaryBrush}" />
                         <TextBox x:Name="WebPublishBox" Margin="0,4,0,12" Padding="6" />
-                        <TextBlock Text="Otomatik escrow klasörleri" Foreground="{StaticResource TextSecondaryBrush}" />
+                        <TextBlock Text="Otomatik escrow klasörleri" Foreground="{DynamicResource TextSecondaryBrush}" />
                         <TextBox x:Name="AutoEscrowDirsBox" AcceptsReturn="True" Height="60" Margin="0,4,0,8" Padding="6" />
-                        <TextBlock Text="Tüm uzantılar otomatik seç (editable vb.)" Foreground="{StaticResource TextSecondaryBrush}" />
+                        <TextBlock Text="Tüm uzantılar otomatik seç (editable vb.)" Foreground="{DynamicResource TextSecondaryBrush}" />
                         <TextBox x:Name="AutoEscrowAllBox" AcceptsReturn="True" Height="60" Margin="0,4,0,0" Padding="6" />
                     </StackPanel>
                 </ScrollViewer>
@@ -51,7 +56,7 @@
             <TabItem Header="Web build">
                 <StackPanel Margin="8">
                     <CheckBox x:Name="RunWebBuildBox" Content="Release öncesi web build çalıştır (dist boşsa)" Margin="0,0,0,12" />
-                    <TextBlock Text="Build komutu (web/ içinde)" Foreground="{StaticResource TextSecondaryBrush}" />
+                    <TextBlock Text="Build komutu (web/ içinde)" Foreground="{DynamicResource TextSecondaryBrush}" />
                     <TextBox x:Name="WebBuildCmdBox" Margin="0,4,0,0" Padding="6" />
                 </StackPanel>
             </TabItem>
@@ -65,16 +70,16 @@
             <TabItem Header="Entegrasyonlar">
                 <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="8">
                     <StackPanel>
-                        <TextBlock Text="Discord webhook URL" Foreground="{StaticResource TextSecondaryBrush}" />
+                        <TextBlock Text="Discord webhook URL" Foreground="{DynamicResource TextSecondaryBrush}" />
                         <TextBox x:Name="DiscordBox" Margin="0,4,0,12" Padding="6" />
-                        <TextBlock Text="GitHub repo (owner/repo)" Foreground="{StaticResource TextSecondaryBrush}" />
+                        <TextBlock Text="GitHub repo (owner/repo)" Foreground="{DynamicResource TextSecondaryBrush}" />
                         <TextBox x:Name="GitHubRepoBox" Margin="0,4,0,8" Padding="6" />
-                        <TextBlock Text="GitHub token (PAT)" Foreground="{StaticResource TextSecondaryBrush}" />
+                        <TextBlock Text="GitHub token (PAT)" Foreground="{DynamicResource TextSecondaryBrush}" />
                         <PasswordBox x:Name="GitHubTokenBox" Margin="0,4,0,8" Padding="6" />
                         <CheckBox x:Name="GitHubOsBox" Content="GitHub'a OS ZIP de yükle" Margin="0,0,0,12" />
-                        <TextBlock Text="Tebex package ID" Foreground="{StaticResource TextSecondaryBrush}" />
+                        <TextBlock Text="Tebex package ID" Foreground="{DynamicResource TextSecondaryBrush}" />
                         <TextBox x:Name="TebexPackageBox" Margin="0,4,0,8" Padding="6" />
-                        <TextBlock Text="Tebex private key" Foreground="{StaticResource TextSecondaryBrush}" />
+                        <TextBlock Text="Tebex private key" Foreground="{DynamicResource TextSecondaryBrush}" />
                         <PasswordBox x:Name="TebexKeyBox" Margin="0,4,0,0" Padding="6" />
                     </StackPanel>
                 </ScrollViewer>
@@ -83,7 +88,7 @@
 
         <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,12,0,0">
             <Button Content="İptal" Click="CancelButton_Click" Margin="0,0,8,0" Padding="16,8" />
-            <Button Content="Kaydet" Style="{StaticResource PrimaryButton}" Click="SaveButton_Click" Padding="16,8" />
+            <Button Content="Kaydet" Style="{DynamicResource PrimaryButton}" Click="SaveButton_Click" Padding="16,8" />
         </StackPanel>
     </Grid>
 </Window>

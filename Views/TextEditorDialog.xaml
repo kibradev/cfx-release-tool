@@ -7,7 +7,7 @@
         MinWidth="480"
         MinHeight="320"
         WindowStartupLocation="CenterOwner"
-        Background="{StaticResource BgBrush}">
+        Background="{DynamicResource BgBrush}">
     <Grid Margin="16">
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
@@ -22,16 +22,16 @@
                  FontFamily="Consolas"
                  FontSize="13"
                  Padding="10"
-                 Background="{StaticResource PanelBrush}"
-                 Foreground="{StaticResource TextPrimaryBrush}"
-                 BorderBrush="{StaticResource BorderBrush}" />
+                 Background="{DynamicResource PanelBrush}"
+                 Foreground="{DynamicResource TextPrimaryBrush}"
+                 BorderBrush="{DynamicResource BorderBrush}" />
         <StackPanel Grid.Row="1"
                     Orientation="Horizontal"
                     HorizontalAlignment="Right"
                     Margin="0,12,0,0">
             <Button x:Name="SaveButton"
                     Content="Kaydet"
-                    Style="{StaticResource PrimaryButton}"
+                    Style="{DynamicResource PrimaryButton}"
                     Padding="16,8"
                     Margin="0,0,8,0"
                     Click="SaveButton_Click" />

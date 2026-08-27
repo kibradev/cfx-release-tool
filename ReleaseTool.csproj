@@ -9,7 +9,7 @@
     <ApplicationIcon />
     <AssemblyName>ReleaseTool</AssemblyName>
     <RootNamespace>ReleaseTool.Desktop</RootNamespace>
-    <Version>1.1.0</Version>
+    <Version>1.2.0</Version>
   </PropertyGroup>
 
   <ItemGroup>
